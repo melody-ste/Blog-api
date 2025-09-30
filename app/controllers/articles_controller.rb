@@ -1,6 +1,6 @@
 class ArticlesController < ApplicationController
-  before_action :authenticate_user!, only: [:create, :update, :edit, :destroy]
-  before_action :set_article, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, only: [:create, :update, :destroy]
+  before_action :set_article, only: [:show, :update, :destroy]
   before_action :authorize_user!, only: [:update, :destroy]
 
 
@@ -20,7 +20,7 @@ class ArticlesController < ApplicationController
     if @article.save
       render json: @article, status: :created
     else
-      render json: @article.errors, status: :unprocessable_content
+      render json: @article.errors, status: :unprocessable_entity
     end
   end
 
@@ -28,7 +28,7 @@ class ArticlesController < ApplicationController
     if @article.update(article_params)
       render json: @article
     else
-      render json: @article.errors, status: :unprocessable_content
+      render json: @article.errors, status: :unprocessable_entity
     end
   end
 
@@ -39,7 +39,7 @@ class ArticlesController < ApplicationController
   private
     
     def set_article
-      @article = Article.find(params.expect(:id))
+      @article = Article.find(params[:id])
     end
 
     def authorize_user!
@@ -47,6 +47,6 @@ class ArticlesController < ApplicationController
     end
 
     def article_params
-      params.expect(article: [ :title, :content ])
+      params.require(:article).permit(:title, :content)
     end
 end
